@@ -15,7 +15,7 @@
             <RowDefinition/>
             <RowDefinition Height="3*"/>
         </Grid.RowDefinitions>
-        <ScrollViewer HorizontalScrollBarVisibility="Visible" Grid.Column="0" BorderBrush="#FF020202" BorderThickness="1" Grid.RowSpan="2">
+        <ScrollViewer x:Name="scrl" HorizontalScrollBarVisibility="Visible" Grid.Column="0" BorderBrush="#FF020202" BorderThickness="1" Grid.RowSpan="2" PanningMode="Both" PreviewMouseUp="scrl_PreviewMouseUp">
             <Canvas x:Name="cnv" Margin="0" MouseWheel="cnv_MouseWheel" Background="White" Width="9000" Height="5000" Grid.IsSharedSizeScope="True">
                 <Canvas.RenderTransform>
                     <ScaleTransform x:Name="st"/>

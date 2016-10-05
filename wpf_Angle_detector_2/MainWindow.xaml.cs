@@ -14,6 +14,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using System.Windows.Threading;
 
 namespace wpf_Angle_detector_2 {
     /// <summary>
@@ -34,6 +35,7 @@ namespace wpf_Angle_detector_2 {
             cnv.Children.Add(rec);
             */
             GetDataFromFile();
+            Angle();
            // Data.Sort((s1,s2) => s1.X.CompareTo(s2.X));
             DrawData(Data);
             pol = new Polyline();
@@ -69,7 +71,7 @@ namespace wpf_Angle_detector_2 {
             while ((line = file.ReadLine()) != null) {
                 if (line != "") {
                     line = line.Substring(1);
-                    // line = line.Substring(17);
+                    //line = line.Substring(17);
                     line = line.Substring(3);
                     counter = 0;
                     temp = "";
@@ -268,7 +270,46 @@ namespace wpf_Angle_detector_2 {
             Console.WriteLine($"Distance of Centre  Right= { Math.Abs(data[640].X - data[indexR].X)}");
             Console.WriteLine($"\n");
 
+            Line l1 = new Line() {
+                Stroke = new SolidColorBrush(Colors.Red),
+                StrokeThickness = 1,
+                HorizontalAlignment = HorizontalAlignment.Left,
+                VerticalAlignment = VerticalAlignment.Center,
+            };
+
+            l1.X1 = 0;
+            l1.Y1 = data[0].Z;
+            l1.X2 = indexL;
+            l1.Y2 = data[indexL].Z;
+
+            Line l2 = new Line() {
+                Stroke = new SolidColorBrush(Colors.Red),
+                StrokeThickness = 1,
+                HorizontalAlignment = HorizontalAlignment.Left,
+                VerticalAlignment = VerticalAlignment.Center,
+            };
+
+            l2.X1 = indexR;
+            l2.Y1 = data[indexR].Z;
+            l2.X2 = data.Count - 1;
+            l2.Y2 = data[data.Count - 1].Z;
+
+            cnv.Children.Add(l1);
+            cnv.Children.Add(l2);
         }
+        public void Angle() {
+
+            for (int i = 0; i < Data.Count; i++) {
+                if (Data[i].Z != 0) {
+                    MyPoint temp = new MyPoint() {
+                        X = Data[i].X,
+                        Z = Data[i].Z + i / 3
+                    };
+                    Data[i] = temp;
+                }
+            }
+        }
+
         private void Rec_MouseEnter(object sender, MouseEventArgs e) {
             Rectangle rec = sender as Rectangle;
             int index = Convert.ToInt32(rec.Name.Substring(2));
@@ -287,6 +328,11 @@ namespace wpf_Angle_detector_2 {
                 st.ScaleX /= ScaleRate;
                 st.ScaleY /= ScaleRate;
             }
+            e.Handled = true;
+        }
+
+        private void scrl_PreviewMouseUp(object sender, MouseButtonEventArgs e) {
+
         }
     }
 }
