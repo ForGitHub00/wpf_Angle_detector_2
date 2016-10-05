@@ -25,7 +25,7 @@
         <Label x:Name="lb_name" Content="Label" Grid.Column="1" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top"/>
         <Label x:Name="lb_x" Content="Label" Grid.Column="1" HorizontalAlignment="Left" Margin="10,41,0,0" VerticalAlignment="Top"/>
         <Label x:Name="lb_z" Content="Label" Grid.Column="1" HorizontalAlignment="Left" Margin="10,72,0,0" VerticalAlignment="Top"/>
-        <Slider x:Name="slider" Grid.Column="1" HorizontalAlignment="Left" Margin="26,10,0,0" Grid.Row="1" VerticalAlignment="Top" Orientation="Vertical" Height="502" Maximum="1" SmallChange="0.01"/>
+        <Slider x:Name="slider" Grid.Column="1" HorizontalAlignment="Left" Margin="26,10,0,0" Grid.Row="1" VerticalAlignment="Top" Orientation="Vertical" Height="502" Maximum="20" SmallChange="0.01"/>
         <Label x:Name="lb_slider" Content="Label" Grid.Column="1" HorizontalAlignment="Left" Margin="96,30,0,0" Grid.Row="1" VerticalAlignment="Top"/>
 
     </Grid>

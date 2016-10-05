@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -33,18 +34,22 @@ namespace wpf_Angle_detector_2 {
             cnv.Children.Add(rec);
             */
             GetDataFromFile();
-            Data.Sort((s1,s2) => s1.X.CompareTo(s2.X));
+           // Data.Sort((s1,s2) => s1.X.CompareTo(s2.X));
             DrawData(Data);
             pol = new Polyline();
             slider.ValueChanged += Slider_ValueChanged;
         }
 
+
+
         private void Slider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e) {
             lb_slider.Content = $"{slider.Value}";
-            cnv.Children.Clear();
-            DrawData(Data);
-            DrawLines(Data, slider.Value);
-            DrawText();
+            Dispatcher.Invoke(() => cnv.Children.Clear());
+            Dispatcher.Invoke(() => DrawData(Data));
+            //DrawData(Data);
+            //DrawLines(Data, slider.Value);
+            //DrawText();
+            Dispatcher.Invoke(() => FindSpad2(Data, slider.Value));
         }
 
         public struct MyPoint {
@@ -55,7 +60,7 @@ namespace wpf_Angle_detector_2 {
         Polyline pol;
         public void GetDataFromFile() {
             Data.Clear();
-            string path = "out.txt";
+            string path = "out6.txt";
             string line;
             string temp = "";
             int counter = 0;
@@ -64,7 +69,8 @@ namespace wpf_Angle_detector_2 {
             while ((line = file.ReadLine()) != null) {
                 if (line != "") {
                     line = line.Substring(1);
-                    line = line.Substring(17);
+                    // line = line.Substring(17);
+                    line = line.Substring(3);
                     counter = 0;
                     temp = "";
                     while (line[counter] != ' ') {
@@ -125,7 +131,7 @@ namespace wpf_Angle_detector_2 {
 
             int index = 0;
             for (int i = 1; i < data.Count; i++) {
-                if (Math.Abs(data[i].Z - data[index].Z) > raz) {
+                if (Math.Abs(data[i].Z - data[index].Z) > raz && data[i].Z != 0 && data[index].Z !=0) {
                     // pol.Points.Add(new Point(i, (data[i].Z - 230) * 10));
                     pol.Points.Add(new Point(i, data[i].Z));
                     index = i;
@@ -157,7 +163,7 @@ namespace wpf_Angle_detector_2 {
                 Console.WriteLine($"Count --- {pol.Points.Count} Degris ---- {degris}");
             }
             
-            //cnv.Children.Add(pol);
+            cnv.Children.Add(pol);
         }
         public void DrawText() {
             for (int i = 1; i < pol.Points.Count; i++) {
@@ -167,7 +173,102 @@ namespace wpf_Angle_detector_2 {
                 Console.WriteLine($"Count --- {pol.Points.Count} Degris ---- {degris}");
             }
         }
+        public void FindSpad(List<MyPoint> data, double raz) {
+            int indexOfMax = 0;
+            double maxValueZ = 0;
 
+            maxValueZ = data.Max((s)=> s.Z);
+            indexOfMax = data.FindIndex((s) => s.Z == maxValueZ);
+            //Console.WriteLine($"Index = {indexOfMax}    Value = {maxValueZ}");
+            /*
+            int left = 0;
+            int right = data.Count - 1;
+            int index = 0;
+            while (left < right) {
+                while (data[left].Z == 0 && left < right - 1) {
+                    left++;
+                }
+                while (data[right].Z == 0 && right - 1 > left) {
+                    right--;
+                }
+                if (Math.Abs(data[left].Z - data[right].Z) >= raz) {
+                    index = left;
+                    break;
+                }
+                left++;
+                right--;
+            }
+            Console.WriteLine($"Raz = {raz}    Index = {index}");
+            */
+
+            double sred = Math.Abs(data[0].Z - data[1].Z);
+            double temp;
+            int tempIndex;
+            for (int i = 2; i < data.Count - 1; i++) {
+                tempIndex = i + 1;
+                while (data[tempIndex].Z == 0 && tempIndex < data.Count - 2) {
+                    tempIndex++;
+                }
+
+                temp = Math.Abs(data[i].Z - data[tempIndex].Z);
+                if (temp <= sred * 8) {
+                    sred *= i - 1;
+                    sred += temp;
+                    sred /= i;
+                }                
+                else {
+                    Console.WriteLine($"Sred = {sred} Index = {i} Z1 = {data[i].Z} Z2 = {data[tempIndex].Z} Raz = {temp}");
+                }
+                i = tempIndex - 1;
+            }
+            Console.WriteLine($"________________________________");
+
+            for (int i = 0; i < data.Count - 1; i++) {
+                tempIndex = i + 1;
+                while (data[tempIndex].Z == 0 && tempIndex < data.Count - 2) {
+                    tempIndex++;
+                }
+
+                temp = Math.Abs(data[i].Z - data[tempIndex].Z);
+                if (temp >= sred * 19) {
+                    Console.WriteLine($"Sred = {sred} Index = {i} Z1 = {data[i].Z} Z2 = {data[tempIndex].Z} Raz = {temp}");
+                }
+                i = tempIndex - 1;
+            }
+            Console.WriteLine($"***************************");
+        }
+        public void FindSpad2(List<MyPoint> data, double raz) {
+            int indexL = 0;
+            int indexR = 0;
+            double z1 = 0;
+            double z2 = 0;
+            double maxRazn = 0;
+
+            int tempIndex = 0;
+            double temp = 0;
+            for (int i = 0; i < data.Count - 1; i++) {
+                tempIndex = i + 1;
+                while (data[tempIndex].Z == 0 && tempIndex < data.Count - 2) {
+                    tempIndex++;
+                }
+
+                temp = Math.Abs(data[i].Z - data[tempIndex].Z);
+                if (temp > maxRazn) {
+                    maxRazn = temp;
+                    indexL = i;
+                    indexR = tempIndex;
+                    z1 = data[i].Z;
+                    z2 = data[tempIndex].Z;
+                    
+                }
+                i = tempIndex - 1;
+            }
+            Console.WriteLine($"Raz = {maxRazn} Left = {indexL} Z1 = {z1} Right = {indexR} Z2 = {z2}");
+            Console.WriteLine($"Distance of Centre  Left= { Math.Abs(data[640].X - data[indexL].X)}");
+            Console.WriteLine($"Distance of Centre  Right= { Math.Abs(data[640].X - data[indexR].X)}");
+            Console.WriteLine($"\n");
+
+        }
         private void Rec_MouseEnter(object sender, MouseEventArgs e) {
             Rectangle rec = sender as Rectangle;
             int index = Convert.ToInt32(rec.Name.Substring(2));
