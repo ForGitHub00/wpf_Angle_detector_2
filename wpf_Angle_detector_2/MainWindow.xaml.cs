@@ -297,6 +297,19 @@ namespace wpf_Angle_detector_2 {
             cnv.Children.Add(l1);
             cnv.Children.Add(l2);
         }
+
+        //ищем усреднение
+        public void Usred(List<MyPoint> data, double raz) {
+            for (int i = 1; i < data.Count - 1; i++) {
+                if (Math.Abs(data[i - 1].Z - data[i + 1].Z) <= raz) {
+                    data[i] = new MyPoint() {
+                        X = data[i].X,
+                        Z = (data[i - 1].Z + data[i + 1].Z) / 2
+                    };
+                }
+            }
+        }         
+        // ищем спад
         public double FindSpad3(List<MyPoint> data, int direction, int topBot) {
             int indexL = 0;
             int indexR = 0;
@@ -354,6 +367,8 @@ namespace wpf_Angle_detector_2 {
 
             return result;
         }
+
+
 
         public void Angle() {
 
