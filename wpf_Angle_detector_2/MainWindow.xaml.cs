@@ -51,7 +51,7 @@ namespace wpf_Angle_detector_2 {
             //DrawData(Data);
             //DrawLines(Data, slider.Value);
             //DrawText();
-            Dispatcher.Invoke(() => FindSpad3(Data, 1, 0));
+            Dispatcher.Invoke(() => FindSpad3(Data, 0, 1));
         }
 
         public struct MyPoint {
@@ -336,7 +336,7 @@ namespace wpf_Angle_detector_2 {
                 i = tempIndex - 1;
             }
 
-            Console.WriteLine($"Raz = {maxRazn} Left = {indexL} Z1 = {z1} Right = {indexR} Z2 = {z2}");
+            //Console.WriteLine($"Raz = {maxRazn} Left = {indexL} Z1 = {z1} Right = {indexR} Z2 = {z2}");
 
             int resultIndex = 0;
             if (data[indexL].Z > data[indexR].Z) {
@@ -348,7 +348,10 @@ namespace wpf_Angle_detector_2 {
                 else resultIndex = indexR;       
             }
 
-            double result = Math.Abs(data[640].X - data[resultIndex].X);
+            double result = data[640].X - data[resultIndex].X;
+            Console.WriteLine($"IndexL = {indexL} IndexR = {indexR} Result = {result} ResIndex = {resultIndex}");
+
+
             return result;
         }
 
