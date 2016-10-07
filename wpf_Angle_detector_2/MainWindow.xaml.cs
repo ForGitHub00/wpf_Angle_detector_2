@@ -51,7 +51,7 @@ namespace wpf_Angle_detector_2 {
             //DrawData(Data);
             //DrawLines(Data, slider.Value);
             //DrawText();
-            Dispatcher.Invoke(() => FindSpad2(Data, slider.Value));
+            Dispatcher.Invoke(() => FindSpad3(Data, 1, 0));
         }
 
         public struct MyPoint {
@@ -297,6 +297,63 @@ namespace wpf_Angle_detector_2 {
             cnv.Children.Add(l1);
             cnv.Children.Add(l2);
         }
+        public double FindSpad3(List<MyPoint> data, int direction, int topBot) {
+            int indexL = 0;
+            int indexR = 0;
+            double z1 = 0;
+            double z2 = 0;
+            double maxRazn = 0;
+
+            int tempIndex = 0;
+            double temp = 0;
+
+            int startIndex = 0;
+            int finishIndex = 0;
+
+            if (direction == 0) {
+                startIndex = 0;
+                finishIndex = data.Count / 2;
+            }
+            else {
+                startIndex = data.Count / 2;
+                finishIndex = data.Count;
+            }
+
+            for (int i = startIndex; i < finishIndex - 1; i++) {
+                tempIndex = i + 1;
+                while (data[tempIndex].Z == 0 && tempIndex < data.Count - 2) {
+                    tempIndex++;
+                }
+
+                temp = Math.Abs(data[i].Z - data[tempIndex].Z);
+                if (temp > maxRazn) {
+                    maxRazn = temp;
+                    indexL = i;
+                    indexR = tempIndex;
+                    z1 = data[i].Z;
+                    z2 = data[tempIndex].Z;
+                }
+                i = tempIndex - 1;
+            }
+
+            Console.WriteLine($"Raz = {maxRazn} Left = {indexL} Z1 = {z1} Right = {indexR} Z2 = {z2}");
+
+            int resultIndex = 0;
+            if (data[indexL].Z > data[indexR].Z) {
+                if (topBot == 0)  resultIndex = indexR;
+                else resultIndex = indexL;               
+            }
+            else {
+                if (topBot == 0)  resultIndex = indexL;
+                else resultIndex = indexR;       
+            }
+
+            double result = Math.Abs(data[640].X - data[resultIndex].X);
+            return result;
+        }
+
+
+
         public void Angle() {
 
             for (int i = 0; i < Data.Count; i++) {
