@@ -348,14 +348,12 @@ namespace wpf_Angle_detector_2 {
                 else resultIndex = indexR;       
             }
 
-            double result = data[640].X - data[resultIndex].X;
+            double result = data[data.Count / 2].X - data[resultIndex].X;
             Console.WriteLine($"IndexL = {indexL} IndexR = {indexR} Result = {result} ResIndex = {resultIndex}");
 
 
             return result;
         }
-
-
 
         public void Angle() {
 
