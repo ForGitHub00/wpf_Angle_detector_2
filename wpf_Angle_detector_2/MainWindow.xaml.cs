@@ -35,7 +35,7 @@ namespace wpf_Angle_detector_2 {
             cnv.Children.Add(rec);
             */
             GetDataFromFile();
-            Angle();
+            //Angle();
            // Data.Sort((s1,s2) => s1.X.CompareTo(s2.X));
             DrawData(Data);
             pol = new Polyline();
@@ -51,7 +51,8 @@ namespace wpf_Angle_detector_2 {
             //DrawData(Data);
             //DrawLines(Data, slider.Value);
             //DrawText();
-            Dispatcher.Invoke(() => FindSpad3(Data, 0, 1));
+            Dispatcher.Invoke(() => Usred(Data, 15));
+            Dispatcher.Invoke(() => FindFigure(Data));
         }
 
         public struct MyPoint {
@@ -300,13 +301,19 @@ namespace wpf_Angle_detector_2 {
 
         //ищем усреднение
         public void Usred(List<MyPoint> data, double raz) {
+            int index = 0;
             for (int i = 1; i < data.Count - 1; i++) {
+                index = i + 1;
+                while (data[index].Z == 0 && index < data.Count - 1) {
+                    index++;
+                }
                 if (Math.Abs(data[i - 1].Z - data[i + 1].Z) <= raz) {
                     data[i] = new MyPoint() {
                         X = data[i].X,
                         Z = (data[i - 1].Z + data[i + 1].Z) / 2
                     };
                 }
+                i = index - 1;
             }
         }         
         // ищем спад
@@ -368,6 +375,54 @@ namespace wpf_Angle_detector_2 {
             return result;
         }
 
+        public double FindFigure(List<MyPoint> data) {
+
+            double result = 0;
+            double max1 = 0;
+            double max2 = 0;
+
+            int index1 = 0;
+            int index2 = 0;
+
+            int tempIndex = 0;
+
+
+            for (int i = 0; i < data.Count; i++) {
+                tempIndex = i + 1;
+                while (data[tempIndex].Z == 0 && tempIndex < data.Count - 2) {
+                    tempIndex++;
+                }
+
+                double temp = Math.Abs(data[i].Z - data[tempIndex].Z);
+
+                if (temp > max2) {
+                    max2 = temp;
+                    if (data[i].Z > data[tempIndex].Z) {
+                        index2 = i;
+                    }
+                    else {
+                        index2 = tempIndex;
+                    }
+                    
+                }
+                if (max1 < max2) {
+                    double t = max1;
+                    max1 = max2;
+                    max2 = t;
+
+                    index1 ^= index2;
+                    index2 ^= index1;
+                    index1 ^= index2;
+                }
+
+                i = tempIndex;
+            }
+
+            result = data[index1].X + data[index2].X;
+            result /= 2;
+            Console.WriteLine($"{result}");
+            return result;
+        }
 
 
         public void Angle() {
